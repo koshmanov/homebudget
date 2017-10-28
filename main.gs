@@ -1,23 +1,3 @@
-//function onModification(event) {
-//  var firstColumnValues = range.getValues();
-//  firstColumnValues[5][5] = new Date();
-//  var sheet = event.source.getActiveSheet();
-//  if (event.changeType == "EDIT") { // When a cell is edited
-//    fillEmptyRows(sheet);
-//  }
-//}
-
-//function fillEmptyRows(sheet) {
-//    var range = sheet.getRange(1, 1, sheet.getMaxRows(), 1);
-//    var firstColumnValues = range.getValues();
-//    for (var i = 0; i < firstColumnValues.length; i++) {
-//      if (firstColumnValues[i][0] == "") { // Column 0 is A
-//         firstColumnValues[i][0] = new Date();
-//      }
-//    }
-//    range.setValues(firstColumnValues);
-//}
-
 function onEdit(e){
 
     var range = e.range;
@@ -162,7 +142,6 @@ function hideRows(){
 }
 
 function getTotalByMonth(sheet) {
-//  sheet = SpreadsheetApp.openById(ssId).getSheetByName('daily expenses');
 
     var s=sheet;
     var date = new Date();
@@ -170,12 +149,11 @@ function getTotalByMonth(sheet) {
 
     var tmp_date, res;
     var v = s.getRange("A:H").getValues().map(function (x) {tmp_date = new Date(x[0]); if (x[6] == "TOTAL" && tmp_date.getMonth()==current_month) { res = x[7]; } return x[7];});
-    Logger.log(res);
+
     return {"month": current_month+1, "total": res}
 }
 
 function getCategories(sheet) {
-    // sheet = SpreadsheetApp.openById(ssId).getSheetByName('daily expenses');
     var s = sheet, res=[], i=0;
 
     s.getRange("K2:L100").getValues().map(function (x, k) {
@@ -187,7 +165,7 @@ function getCategories(sheet) {
         }
         i++;
     });
-//  Logger.log(res);
+
     return res;
 }
   
