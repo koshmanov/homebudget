@@ -32,4 +32,4 @@
  
  <h3>Screenshots</h3>
  
- ![telegram bot](https://lh5.googleusercontent.com/YOxGLAwQoPc6mPyTv9NCp_JeCSp1mwAxKfzIVLE_G-PErmdi3iTmiDnr-HBqjW5te9Y9-LvjKVRQZHQ=w1919-h983)
+<img src="images/telegram_1.png"/>
