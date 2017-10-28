@@ -1,8 +1,8 @@
-##**The homebudget app**
+<h2>**The homebudget app**</h2>
 
-#####The google spreadsheet application with telegram bot integration.
+<h5>The google spreadsheet application with telegram bot integration.</h5>
 
-###*Instalation*
+<h3>*Instalation*</h5>
 
  1. Create copy google spreadsheet document from [template](https://goo.gl/48ymYK)
  2. In the created document go to *"Tools"* -> *"Script editor..."*
@@ -30,8 +30,6 @@
  12. In telegram bot chat: type */total* for get total by current month.
  13. That's all!
  
- ###*Screenshots*
+ <h3>*Screenshots*</h3>
  
- ![telegram bot](https://drive.google.com/open?id=0B1CaSjYNRdI6RUtjOGpVa2pJVXM)
-
-
+ ![telegram bot](https://lh5.googleusercontent.com/YOxGLAwQoPc6mPyTv9NCp_JeCSp1mwAxKfzIVLE_G-PErmdi3iTmiDnr-HBqjW5te9Y9-LvjKVRQZHQ=w1919-h983)
