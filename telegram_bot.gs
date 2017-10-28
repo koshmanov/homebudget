@@ -1,4 +1,4 @@
-function getMe() {
+function getMe(){
     var url = telegramUrl + '/getMe';
     var response = UrlFetchApp.fetch(url);
     Logger.log(response.getContentText());
@@ -11,45 +11,17 @@ function setWebhook() {
 }
 
 function sendMessage(id, text) {
-    var inline_keyboard = {
-//    "ReplyKeyboardRemove": {
-//      "remove_keyboard": true,
-        "inline_keyboard": [
-            [
-                {"text": "working_lunch", "switch_inline_query_current_chat": "working_lunch "},
-                {"text": "food", "switch_inline_query_current_chat": "food "},
-                {"text": "taxi", "switch_inline_query_current_chat": "taxi "},
-            ],
-            [{"text": "shopping", "switch_inline_query_current_chat": "shopping "},
-                {"text": "entertainment", "switch_inline_query_current_chat": "entertainment "},
-                {"text": "makeup", "switch_inline_query_current_chat": "makeup "},
-            ],
-            [
-                {"text": "medicine", "switch_inline_query_current_chat": "medicine "},
-                {"text": "education", "switch_inline_query_current_chat": "education "},
-                {"text": "gifts", "switch_inline_query_current_chat": "gifts "},
-            ]
-        ],
-//    "ReplyKeyboardMarkup": {
-//      "keyboard": [
-//        [{"text": '1'}, {"text": '2'}, {"text": '3'}],
-//        [{"text": '4'}, {"text": '5'}, {"text": '6'}],
-//        [{"text": '7'}, {"text": '8'}, {"text": '9'}],
-//        [{"text": '0'}]
-//      ],
-//      "resize_keyboard": true,
-//      "one_time_keyboard": true
-//    }
-    };
-    var url = telegramUrl + '/sendMessage'
-        + '?chat_id=' + id
+
+    inline_keyboard = createInlineKeyboard();
+    var url = telegramUrl  + '/sendMessage'
+        +'?chat_id=' + id
         + '&text=' + text
-        + '&reply_markup=' + encodeURIComponent(JSON.stringify(inline_keyboard, null)) + '';
+        + '&reply_markup=' + encodeURIComponent(JSON.stringify(inline_keyboard,null).replace(/\\u/g, '\u')) + '';
     Logger.log(url);
     var params = {
         "method": "get",
         "escaping": false,
-        "muteHttpExceptions": false
+        "muteHttpExceptions":false
     }
 
     var response = UrlFetchApp.fetch(url, params);
@@ -63,22 +35,22 @@ function doPost(e) {
     var text = data.message.text;
     var name = data.message.chat.first_name;
 
-    Ids.map(function (x) {
-        if (x == data.message.from.id) {
+    Ids.map(function(x){
+        if(x == data.message.from.id){
             is_allow = true;
 
         }
     });
-    if (!is_allow) {
+    if(!is_allow){
         sendMessage(id, "Premission denied: 403; debug: allow - " + is_allow + " user_id: " + data.message.from.id);
         return;
     }
 
     var sheet = SpreadsheetApp.openById(ssId).getSheetByName('daily expenses');
 
-    if (/^\//.test(text)) {
+    if(/^\//.test(text)) {
         var commandName = text.slice(1);
-        if (commandName == "total") {
+        if( commandName == "total"){
             var total = getTotalByMonth(sheet);
             sendMessage(id, name + ", for current (" + total.month + ") month, TOTAL is: " + total.total);
             return;
@@ -88,14 +60,16 @@ function doPost(e) {
 
     var type = splited_message[1];
     var value = splited_message[2];
-    var comment = splited_message[3] ? splited_message.slice(3).join(" ") : "";
+    var comment = splited_message[3]?splited_message.slice(3).join(" "):"";
 
     var answer = "Hi " + name + ", thanks for the request: " + type + " - " + value + " " + comment;
 
-    SpreadsheetApp.openById(ssId).getSheetByName('bot_logs').appendRow([new Date(), id, name, text, answer, JSON.stringify(e, null, 4)]);
+    SpreadsheetApp.openById(ssId).getSheetByName('bot_logs').appendRow([new Date(),id,name,text,answer, JSON.stringify(e, null, 4)]);
 
-    if (type && value) {
-        var result = sheet.appendRow([new Date(), type, value, comment, name]);
+    if (type && value){
+        processData(type,value,comment, name);
+//    var result = sheet.appendRow([new Date(),type,value,comment, name ]);
+
         sendMessage(id, answer);
         sumByMonthByType(SpreadsheetApp.openById(ssId).getSheetByName('daily expenses'));
     }
@@ -103,6 +77,49 @@ function doPost(e) {
 
 //mail debugger
 //  GmailApp.sendEmail(Session.getEffectiveUser().getEmail(), 'message from bot', JSON.stringify(e,null,4));
+
+}
+
+function processData (type, value, comment, name){
+    var sheet = SpreadsheetApp.openById(ssId).getSheetByName('daily expenses');
+    var result;
+
+    if (type == 'income') {
+        result = sheet.appendRow([new Date(),type,'',comment, name, value ]);
+    }else{
+        result = sheet.appendRow([new Date(),type,value,comment, name ]);
+    }
+
+    return result;
+}
+
+function createInlineKeyboard(){
+    var types = getCategories(SpreadsheetApp.openById(ssId).getSheetByName('daily expenses'));
+
+    var res = [],k=0,j=0;
+    res[0] = [];
+
+    for(var i in types){
+        if(types[i][0] == ""){
+            break;
+        }
+
+        res[j][k] = {
+            "text": types[i][1] + " " + types[i][0],
+            "switch_inline_query_current_chat": "" + types[i][0] + " "
+        };
+
+        k++;
+        if(i != 0 && !((i+1)%3)){
+            j++;
+            res[j]=[];
+            k=0;
+        }
+    }
+
+    return {
+        "inline_keyboard": res,
+    };
 
 }
 
