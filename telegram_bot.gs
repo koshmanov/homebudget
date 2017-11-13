@@ -6,6 +6,7 @@ function sendMessage(id, text) {
     var url = telegramUrl  + '/sendMessage'
         +'?chat_id=' + id
         + '&text=' + text
+        + '&parse_mode=markdown'
         + '&reply_markup=' + encodeURIComponent(JSON.stringify(inline_keyboard,null).replace(/\\u/g, '\u')) + '';
     Logger.log(url);
     var params = {
@@ -14,7 +15,22 @@ function sendMessage(id, text) {
         "muteHttpExceptions":false
     }
 
-    var response = UrlFetchApp.fetch(url, params);
+    var url1 = telegramUrl + '/sendMessage';
+    var payload = {
+        "chat_id": id,
+        "text": text,
+        "parse_mode": 'markdown',
+        "reply_markup": JSON.stringify(inline_keyboard,null).replace(/\\u/g, '\u')
+    }
+    var params1 = {
+        "method": "post",
+        "contentType" : "application/x-www-form-urlencoded",
+        "escaping": false,
+        "muteHttpExceptions":false,
+        "payload": payload
+    }
+
+    var response = UrlFetchApp.fetch(url1, params1);
     Logger.log(response.getContentText());
 }
 
@@ -42,7 +58,8 @@ function doPost(e) {
         var commandName = text.slice(1);
         if( commandName == "total"){
             var total = getTotalByMonth(sheet);
-            sendMessage(id, name + ", for current (" + total.month + ") month, TOTAL is: " + total.total);
+            var income = getIncomeByMonth(sheet);
+            sendMessage(id, " *Month:* " + total.month + ", *TOTAL*: " + total.total + ", *Income*: " + income.total);
             return;
         }
     }

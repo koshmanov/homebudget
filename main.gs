@@ -157,7 +157,14 @@ function getTotalByMonth(sheet) {
     var current_month = date.getMonth();
 
     var tmp_date, res;
-    var v = s.getRange("A:H").getValues().map(function (x) {tmp_date = new Date(x[0]); if (x[6] == "TOTAL" && tmp_date.getMonth()==current_month) { res = x[7]; } return x[7];});
+    var v = s.getRange("A:H").getValues().map(function (x) {
+        tmp_date = new Date(x[0]);
+        if (tmp_date.getMonth()==current_month && x[6] == "TOTAL" ) {
+            res = x[7];
+        }
+        return x[7];
+    });
+
     Logger.log(res);
     return {"month": current_month+1, "total": res}
 }
@@ -177,6 +184,27 @@ function getCategories(sheet) {
     });
 //  Logger.log(res);
     return res;
+}
+
+function getIncomeByMonth(sheet) {
+//  var sheet = SpreadsheetApp.openById(ssId).getSheetByName('daily expenses');
+
+    var s=sheet;
+    var date = new Date();
+    var current_month = date.getMonth();
+
+    var tmp_date, res;
+
+    var v = s.getRange("A:H").getValues().map(function (x) {
+        tmp_date = new Date(x[0]);
+        if (tmp_date.getMonth()==current_month && x[6] == "income" ) {
+            res = x[7];
+        }
+        return x[7];
+    });
+
+//  Logger.log(res);
+    return {"month": current_month+1, "total": res}
 }
   
   
