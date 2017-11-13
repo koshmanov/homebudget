@@ -165,7 +165,7 @@ function getTotalByMonth(sheet) {
         return x[7];
     });
 
-    Logger.log(res);
+    // Logger.log(res);
     return {"month": current_month+1, "total": res}
 }
 
@@ -182,7 +182,6 @@ function getCategories(sheet) {
         }
         i++;
     });
-//  Logger.log(res);
     return res;
 }
 
@@ -203,7 +202,6 @@ function getIncomeByMonth(sheet) {
         return x[7];
     });
 
-//  Logger.log(res);
     return {"month": current_month+1, "total": res}
 }
   

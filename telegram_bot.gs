@@ -3,26 +3,17 @@
 function sendMessage(id, text) {
 
     inline_keyboard = createInlineKeyboard();
-    var url = telegramUrl  + '/sendMessage'
-        +'?chat_id=' + id
-        + '&text=' + text
-        + '&parse_mode=markdown'
-        + '&reply_markup=' + encodeURIComponent(JSON.stringify(inline_keyboard,null).replace(/\\u/g, '\u')) + '';
-    Logger.log(url);
-    var params = {
-        "method": "get",
-        "escaping": false,
-        "muteHttpExceptions":false
-    }
 
-    var url1 = telegramUrl + '/sendMessage';
+    var url = telegramUrl + '/sendMessage';
+
     var payload = {
         "chat_id": id,
         "text": text,
         "parse_mode": 'markdown',
         "reply_markup": JSON.stringify(inline_keyboard,null).replace(/\\u/g, '\u')
     }
-    var params1 = {
+
+    var params = {
         "method": "post",
         "contentType" : "application/x-www-form-urlencoded",
         "escaping": false,
@@ -30,7 +21,7 @@ function sendMessage(id, text) {
         "payload": payload
     }
 
-    var response = UrlFetchApp.fetch(url1, params1);
+    var response = UrlFetchApp.fetch(url, params);
     Logger.log(response.getContentText());
 }
 
@@ -75,7 +66,6 @@ function doPost(e) {
 
     if (type && value){
         processData(type,value,comment, name);
-//    var result = sheet.appendRow([new Date(),type,value,comment, name ]);
 
         sendMessage(id, answer);
         sumByMonthByType(SpreadsheetApp.openById(ssId).getSheetByName('daily expenses'));
