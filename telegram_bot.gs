@@ -50,7 +50,7 @@ function doPost(e) {
         if( commandName == "total"){
             var total = getTotalByMonth(sheet);
             var income = getIncomeByMonth(sheet);
-            sendMessage(id, " *Month:* " + total.month + ", *TOTAL*: " + total.total + ", *Income*: " + income.total);
+            sendMessage(id, " *Month:* " + total.month + " *|* *TOTAL*: " + total.total + " *|* *Income*: " + income.total);
             return;
         }
     }
