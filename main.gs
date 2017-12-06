@@ -108,7 +108,9 @@ function sumByMonthByType (sheet){
     Logger.log(total_res.getValues());
     total_res.setValues([['TOTAL', total_sum]]);
 
-    sheet.getRange(parseInt(first_match) + 2, 1, 1, SpreadsheetApp.getActiveSpreadsheet().getLastColumn()-1).setBackgroundColor("#c9daf8");
+    var sheet_temp = SpreadsheetApp.openById(ssId).getSheetByName('daily expenses');
+
+    sheet.getRange(parseInt(first_match) + 2, 1, 1, sheet_temp.getLastColumn()-1).setBackgroundColor("#c9daf8");
 
     var full_res = sheet.getRange(parseInt(first_match) + 2, 7, outputRows.length+1, 2);
     sheet.getRange(parseInt(first_match) + 2, 7, outputRows.length+1, 2).setBorder(true, true, true, true, true, true, null, SpreadsheetApp.BorderStyle.SOLID);

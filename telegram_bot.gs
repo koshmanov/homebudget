@@ -9,7 +9,7 @@ function sendMessage(id, text) {
     var payload = {
         "chat_id": id,
         "text": text,
-        "parse_mode": 'markdown',
+        "parse_mode": 'html',
         "reply_markup": JSON.stringify(inline_keyboard,null).replace(/\\u/g, '\u')
     }
 
@@ -50,7 +50,7 @@ function doPost(e) {
         if( commandName == "total"){
             var total = getTotalByMonth(sheet);
             var income = getIncomeByMonth(sheet);
-            sendMessage(id, " *Month:* " + total.month + " *|* *TOTAL*: " + total.total + " *|* *Income*: " + income.total);
+            sendMessage(id, " <b>Month:</b> " + total.month + " <b>| TOTAL</b>: " + total.total + " <b>| Income</b>: " + income.total);
             return;
         }
     }
