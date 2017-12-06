@@ -53,6 +53,10 @@ function doPost(e) {
             sendMessage(id, " <b>Month:</b> " + total.month + " <b>| TOTAL</b>: " + total.total + " <b>| Income</b>: " + income.total);
             return;
         }
+        if ( commandName == "doc_url"){
+            sendMessage(id, "<b> url: </b>" + doc_short_url);
+            return;
+        }
     }
     var splited_message = text.split(" ");
 
