@@ -3,4 +3,4 @@ var telegramUrl = 'https://api.telegram.org/bot' + token;
 var webAppUrl = "https://script.google.com/macros/s/__some_app_token__/exec";
 var ssId = ''; //google spreadsheet id
 var Ids = []; //telegram users ids for restricts access
-var doc_short_url = "";
+var doc_short_url = ""; // endpoint /doc_url in the telegram bot
