@@ -74,7 +74,7 @@ function sumByMonthByType (sheet){
     Logger.log("row: --");
     Logger.log(row);
 
-    var type_values = sheet.getRange(2, 11,15);
+    var type_values = sheet.getRange(2, 11,20);
 
 
     var type_values_val = type_values.getValues();
