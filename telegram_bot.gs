@@ -30,14 +30,16 @@ function doPost(e) {
     var data = JSON.parse(e.postData.contents);
     var id = data.message.chat.id;
     var text = data.message.text;
-    var name = data.message.chat.first_name;
+    var name = data.message.from.first_name;
+
+    var splited_message = text.split(" ");
 
     Ids.map(function(x){
         if(x == data.message.from.id){
             is_allow = true;
-
         }
     });
+
     if(!is_allow){
         sendMessage(id, "Premission denied: 403; debug: allow - " + is_allow + " user_id: " + data.message.from.id);
         return;
@@ -46,7 +48,7 @@ function doPost(e) {
     var sheet = SpreadsheetApp.openById(ssId).getSheetByName('daily expenses');
 
     if(/^\//.test(text)) {
-        var commandName = text.slice(1);
+        var commandName = data.message.chat.type=='group'?text.slice(1, text.indexOf("@")):text.slice(1);
         if( commandName == "total"){
             var total = getTotalByMonth(sheet);
             var income = getIncomeByMonth(sheet);
@@ -58,7 +60,10 @@ function doPost(e) {
             return;
         }
     }
-    var splited_message = text.split(" ");
+
+    if (splited_message[0] != bot_name){
+        return;
+    }
 
     var type = splited_message[1];
     var value = splited_message[2];
