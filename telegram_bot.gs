@@ -52,7 +52,8 @@ function doPost(e) {
         if( commandName == "total"){
             var total = getTotalByMonth(sheet);
             var income = getIncomeByMonth(sheet);
-            sendMessage(id, " <b>Month:</b> " + total.month + " <b>| TOTAL</b>: " + total.total + " <b>| Income</b>: " + income.total + " <b>| Balance</b>: " + (income.total - total.total) );
+            sendMessage(id, " <b>Month:</b> " + total.month + "\n<b>TOTAL:</b> " + total.total + " <b>| Income:</b> "
+                + income.total + " <b>| Balance:</b> " + (income.total - total.total) );
             return;
         }
         if ( commandName == "doc_url"){
