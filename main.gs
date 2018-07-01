@@ -45,7 +45,7 @@ function sumByMonthByType (sheet){
         tmp_val = date_range_val[i];
         tmp_val_date = new Date(tmp_val);
 
-        if (tmp_val_date.getMonth() == current_date.getMonth()){
+        if (tmp_val_date.getYear() == current_date.getYear() && tmp_val_date.getMonth() == current_date.getMonth()){
             if (first_match == false){
                 first_match = i;
             }
@@ -108,9 +108,9 @@ function sumByMonthByType (sheet){
     Logger.log(total_res.getValues());
     total_res.setValues([['TOTAL', total_sum]]);
 
-    var sheet_temp = SpreadsheetApp.openById(ssId).getSheetByName('daily expenses');
+    //var sheet_temp = SpreadsheetApp.openById(ssId).getSheetByName('daily expenses');
 
-    sheet.getRange(parseInt(first_match) + 2, 1, 1, sheet_temp.getLastColumn()-1).setBackgroundColor("#c9daf8");
+    sheet.getRange(parseInt(first_match) + 2, 1, 1, sheet.getLastColumn()-1).setBackgroundColor("#c9daf8");
 
     var full_res = sheet.getRange(parseInt(first_match) + 2, 7, outputRows.length+1, 2);
     sheet.getRange(parseInt(first_match) + 2, 7, outputRows.length+1, 2).setBorder(true, true, true, true, true, true, null, SpreadsheetApp.BorderStyle.SOLID);
@@ -144,7 +144,7 @@ function hideRows(){
         tmp_val = date_range_values[i];
         tmp_val_date = new Date(tmp_val);
 
-        if (tmp_val_date.getMonth() == current_date.getMonth()){
+        if (tmp_val_date.getYear() == current_date.getYear() && tmp_val_date.getMonth() == current_date.getMonth()){
             sheet.hideRows(2, j-1);
             return;
         }
