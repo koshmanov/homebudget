@@ -206,6 +206,26 @@ function getIncomeByMonth(sheet) {
 
     return {"month": current_month+1, "total": res}
 }
+
+
+function getCategoryValueByMonth(sheet, category) {
+    //var sheet = SpreadsheetApp.openById(ssId).getSheetByName('daily expenses');
+
+    var s=sheet;
+    var date = new Date();
+    var current_month = date.getMonth();
+
+    var tmp_date, res;
+
+    var v = s.getRange("A:H").getValues().map(function (x) {
+        tmp_date = new Date(x[0]);
+        if (tmp_date.getMonth()==current_month && x[6] == category ) {
+            res = x[7];
+        }
+        return x[7];
+    });
+    return {"month": current_month+1, "value": res}
+}
   
   
   

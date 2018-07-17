@@ -50,10 +50,14 @@ function doPost(e) {
     if(/^\//.test(text)) {
         var commandName = data.message.chat.type=='group'?text.slice(1, text.indexOf("@")):text.slice(1);
         if( commandName == "total"){
-            var total = getTotalByMonth(sheet);
-            var income = getIncomeByMonth(sheet);
-            sendMessage(id, " <b>Month:</b> " + total.month + "\n<b>TOTAL:</b> " + total.total + " <b>| Income:</b> "
-                + income.total + " <b>| Balance:</b> " + (income.total - total.total) );
+            var total = getCategoryValueByMonth(sheet, 'TOTAL');
+            var income = getCategoryValueByMonth(sheet, 'income');
+            var currency = getCategoryValueByMonth(sheet, 'currency');
+
+            currency.value = currency.value ? currency.value : 0;
+
+            sendMessage(id, " <b>Month:</b> " + total.month + "\n<b>TOTAL:</b> " + (total.value - currency.value) + " <b>| Income:</b> "
+                + income.value + " <b>| Balance:</b> " + (income.value - total.value) );
             return;
         }
         if ( commandName == "doc_url"){
