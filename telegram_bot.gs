@@ -1,6 +1,8 @@
 
-
-function sendMessage(id, text) {
+function sendMessage(id, text, disable_notification) {
+    if (disable_notification == null) {
+      disable_notification = false;
+    }
 
     inline_keyboard = createInlineKeyboard();
 
@@ -9,6 +11,7 @@ function sendMessage(id, text) {
     var payload = {
         "chat_id": id,
         "text": text,
+        "disable_notification": disable_notification,
         "parse_mode": 'html',
         "reply_markup": JSON.stringify(inline_keyboard,null).replace(/\\u/g, '\u')
     }
@@ -53,9 +56,9 @@ function doPost(e) {
             var total = getCategoryValueByMonth(sheet, 'TOTAL');
             var income = getCategoryValueByMonth(sheet, 'income');
             var currency = getCategoryValueByMonth(sheet, 'currency');
-
+          
             currency.value = currency.value ? currency.value : 0;
-
+          
             sendMessage(id, " <b>Month:</b> " + total.month + "\n<b>TOTAL:</b> " + (total.value - currency.value) + " <b>| Income:</b> "
                 + income.value + " <b>| Balance:</b> " + (income.value - total.value) );
             return;
@@ -75,13 +78,13 @@ function doPost(e) {
     var comment = splited_message[3]?splited_message.slice(3).join(" "):"";
 
     var answer = "Hi " + name + ", thanks for the request: " + type + " - " + value + " " + comment;
-
+    answer = "√"
     SpreadsheetApp.openById(ssId).getSheetByName('bot_logs').appendRow([new Date(),id,name,text,answer, JSON.stringify(e, null, 4)]);
 
     if (type && value){
         processData(type,value,comment, name);
 
-        sendMessage(id, answer);
+        sendMessage(id, answer, true);
         sumByMonthByType(SpreadsheetApp.openById(ssId).getSheetByName('daily expenses'));
     }
 

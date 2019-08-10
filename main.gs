@@ -49,7 +49,9 @@ function sumByMonthByType (sheet){
             if (first_match == false){
                 first_match = i;
             }
-
+            if(type_range_val[i].toString().toLowerCase() == ''){
+                continue;
+            }
             types[type_range_val[i]] += Number(value_range_val[i]);
 
             result_sum += Number(value_range_val[i]);
@@ -71,7 +73,7 @@ function sumByMonthByType (sheet){
     types.sort(function (a, b) {
         return a.value - b.value;
     });
-    Logger.log("row: --");
+    Logger.log("74 row: --");
     Logger.log(row);
 
     var type_values = sheet.getRange(2, 11,20);
@@ -80,8 +82,8 @@ function sumByMonthByType (sheet){
     var type_values_val = type_values.getValues();
     var outputRows = [];
 
-    Logger.log("row: --");
-    Logger.log(type_values_val);
+    //Logger.log("row: --");
+    //Logger.log(type_values_val);
 
     var tmp_val, j=0, total_sum=0;
     for (var i in type_values_val) {
@@ -91,25 +93,34 @@ function sumByMonthByType (sheet){
             continue;
 
         outputRows[j] = [tmp_val, row[tmp_val]];
-        if(tmp_val != 'income'){
+        if(tmp_val != 'income' && tmp_val != 'apartment'){
             total_sum += row[tmp_val];
         }
         j++;
     }
 
-    Logger.log("OutputRows: --");
+    Logger.log("102 OutputRows: --");
     Logger.log(outputRows);
 
     var result_range = sheet.getRange(parseInt(first_match) + 3, 7, outputRows.length, 2);//because range starts from A2
 
+  
+    //Logger.log("108 result_range: --");
+    //Logger.log(outputRows);
+  
     result_range.setValues(outputRows);
+  
 
     var total_res = sheet.getRange(parseInt(first_match) + 2, 7, 1, 2);
-    Logger.log(total_res.getValues());
+    //Logger.log(total_res.getValues());
     total_res.setValues([['TOTAL', total_sum]]);
+  
+  
+    Logger.log("119 total_res: --");
+    Logger.log(first_match);
 
     //var sheet_temp = SpreadsheetApp.openById(ssId).getSheetByName('daily expenses');
-
+  
     sheet.getRange(parseInt(first_match) + 2, 1, 1, sheet.getLastColumn()-1).setBackgroundColor("#c9daf8");
 
     var full_res = sheet.getRange(parseInt(first_match) + 2, 7, outputRows.length+1, 2);
@@ -143,7 +154,7 @@ function hideRows(){
         j++;
         tmp_val = date_range_values[i];
         tmp_val_date = new Date(tmp_val);
-
+      
         if (tmp_val_date.getYear() == current_date.getYear() && tmp_val_date.getMonth() == current_date.getMonth()){
             sheet.hideRows(2, j-1);
             return;
@@ -152,16 +163,17 @@ function hideRows(){
 }
 
 function getTotalByMonth(sheet) {
-//  sheet = SpreadsheetApp.openById(ssId).getSheetByName('daily expenses');
+  sheet = SpreadsheetApp.openById(ssId).getSheetByName('daily expenses');
 
     var s=sheet;
     var date = new Date();
     var current_month = date.getMonth();
+    var current_year = date.getYear();
 
     var tmp_date, res;
     var v = s.getRange("A:H").getValues().map(function (x) {
         tmp_date = new Date(x[0]);
-        if (tmp_date.getMonth()==current_month && x[6] == "TOTAL" ) {
+        if (tmp_date.getYear() == current_year && tmp_date.getMonth()==current_month && x[6] == "TOTAL" ) {
             res = x[7];
         }
         return x[7];
@@ -193,12 +205,13 @@ function getIncomeByMonth(sheet) {
     var s=sheet;
     var date = new Date();
     var current_month = date.getMonth();
+    var current_year = date.getYear();
 
     var tmp_date, res;
 
     var v = s.getRange("A:H").getValues().map(function (x) {
         tmp_date = new Date(x[0]);
-        if (tmp_date.getMonth()==current_month && x[6] == "income" ) {
+        if (tmp_date.getYear() == current_year && tmp_date.getMonth()==current_month && x[6] == "income" ) {
             res = x[7];
         }
         return x[7];
@@ -209,21 +222,24 @@ function getIncomeByMonth(sheet) {
 
 
 function getCategoryValueByMonth(sheet, category) {
-    //var sheet = SpreadsheetApp.openById(ssId).getSheetByName('daily expenses');
-
+  //category = "";
+  //var sheet = SpreadsheetApp.openById(ssId).getSheetByName('daily expenses');
+  
     var s=sheet;
     var date = new Date();
     var current_month = date.getMonth();
+    var current_year = date.getYear();
 
     var tmp_date, res;
 
     var v = s.getRange("A:H").getValues().map(function (x) {
         tmp_date = new Date(x[0]);
-        if (tmp_date.getMonth()==current_month && x[6] == category ) {
+        if (tmp_date.getYear() == current_year && tmp_date.getMonth()==current_month && x[6] == category ) {
             res = x[7];
         }
         return x[7];
     });
+    //Logger.log(res);
     return {"month": current_month+1, "value": res}
 }
   
