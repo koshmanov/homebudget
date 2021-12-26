@@ -1,7 +1,7 @@
 
 function sendMessage(id, text, disable_notification) {
     if (disable_notification == null) {
-      disable_notification = false;
+        disable_notification = false;
     }
 
     inline_keyboard = createInlineKeyboard();
@@ -53,18 +53,58 @@ function doPost(e) {
     if(/^\//.test(text)) {
         var commandName = data.message.chat.type=='group'?text.slice(1, text.indexOf("@")):text.slice(1);
         if( commandName == "total"){
-            var total = getCategoryValueByMonth(sheet, 'TOTAL');
-            var income = getCategoryValueByMonth(sheet, 'income');
-            var currency = getCategoryValueByMonth(sheet, 'currency');
-          
+            var month = parseInt(splited_message[1]) - 1;
+
+            var total = getCategoryValueByMonth(sheet, 'TOTAL', month);
+            var income = getCategoryValueByMonth(sheet, 'income', month);
+            var currency = getCategoryValueByMonth(sheet, 'currency', month);
+
+            var categories = getCategories(sheet);
+            var categories_values = {};
+
+            for (var i in categories) {
+                value = getCategoryValueByMonth(sheet, categories[i][0], month)['value'];
+                if ( value != null && value > 0) {
+                    categories_values[i] = [categories[i][0], value];
+                }
+            }
+
+            var col1_length=14, col2_length=7, length1=0, length2=0;
+
+            var category_table = "<pre>";
+            for (var i in categories_values) {
+                length1 = categories_values[i][0].length
+                length2 = categories_values[i][1].toString().length
+
+                category_table += "\n| " + categories_values[i][0] + new Array(col1_length - length1).join(' ') + "| "
+
+                    + categories_values[i][1] + new Array(col2_length - length2).join(' ') + " |"
+            }
+            category_table +="</pre>"
+
             currency.value = currency.value ? currency.value : 0;
-          
-            sendMessage(id, " <b>Month:</b> " + total.month + "\n<b>TOTAL:</b> " + (total.value - currency.value) + " <b>| Income:</b> "
-                + income.value + " <b>| Balance:</b> " + (income.value - total.value) );
+
+            var message_text = " <b>Month:</b> " + total.month
+                + "\n<b>TOTAL:</b> " + (total.value - currency.value)
+                + " <b>| Income:</b> " + income.value
+                + " <b>| Balance:</b> " + (income.value - total.value)
+                + category_table;
+
+            sendMessage(id,  message_text);
             return;
         }
         if ( commandName == "doc_url"){
             sendMessage(id, "<b> url: </b>" + doc_short_url);
+            return;
+        }
+        if (commandName == "check_balance") {
+            var val = checkExpenses(sheet)
+
+            // prev_month_balance - разница между тем сколько было получено и потрачено в прошлом месяце
+            // start_month_balance - количество денег на старт этого месяца
+            message_text = "<b>diff: " + val.diff + "</b>\nprev month: " + val.prev_month_balance + "\ncurrent balance: " + val.current_month_balance;
+
+            sendMessage(id, message_text);
             return;
         }
     }
@@ -78,6 +118,8 @@ function doPost(e) {
     var comment = splited_message[3]?splited_message.slice(3).join(" "):"";
 
     var answer = "Hi " + name + ", thanks for the request: " + type + " - " + value + " " + comment;
+    //answer = "\u2705";
+    //answer = ".\u2714\ufe0f";
     answer = "√"
     SpreadsheetApp.openById(ssId).getSheetByName('bot_logs').appendRow([new Date(),id,name,text,answer, JSON.stringify(e, null, 4)]);
 

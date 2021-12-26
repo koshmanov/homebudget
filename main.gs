@@ -9,6 +9,7 @@ function onEdit(e){
     var sheet = ss.getSheets()[0];
 
     var range_glob = sheet.getRange(row , 1);
+
     sumByMonthByType();
 
     if (range_glob.getValue() == "") {
@@ -82,13 +83,10 @@ function sumByMonthByType (sheet){
     var type_values_val = type_values.getValues();
     var outputRows = [];
 
-    //Logger.log("row: --");
-    //Logger.log(type_values_val);
-
     var tmp_val, j=0, total_sum=0;
     for (var i in type_values_val) {
         tmp_val = type_values_val[i][0];
-//    Logger.log([tmp_val, row[tmp_val]]);
+
         if( tmp_val == '' || typeof tmp_val == 'undefined' || typeof row[tmp_val] == 'undefined' || row[tmp_val].length === 0 )
             continue;
 
@@ -104,24 +102,21 @@ function sumByMonthByType (sheet){
 
     var result_range = sheet.getRange(parseInt(first_match) + 3, 7, outputRows.length, 2);//because range starts from A2
 
-  
-    //Logger.log("108 result_range: --");
-    //Logger.log(outputRows);
-  
+
     result_range.setValues(outputRows);
-  
+
 
     var total_res = sheet.getRange(parseInt(first_match) + 2, 7, 1, 2);
-    //Logger.log(total_res.getValues());
+
     total_res.setValues([['TOTAL', total_sum]]);
-  
-  
+
+
     Logger.log("119 total_res: --");
     Logger.log(first_match);
 
-    //var sheet_temp = SpreadsheetApp.openById(ssId).getSheetByName('daily expenses');
-  
     sheet.getRange(parseInt(first_match) + 2, 1, 1, sheet.getLastColumn()-1).setBackgroundColor("#c9daf8");
+
+    sheet.getRange(parseInt(first_match) + 3, 1, 1, 1).setValue(new Date(current_date.getFullYear(), current_date.getMonth(), 1));
 
     var full_res = sheet.getRange(parseInt(first_match) + 2, 7, outputRows.length+1, 2);
     sheet.getRange(parseInt(first_match) + 2, 7, outputRows.length+1, 2).setBorder(true, true, true, true, true, true, null, SpreadsheetApp.BorderStyle.SOLID);
@@ -154,7 +149,7 @@ function hideRows(){
         j++;
         tmp_val = date_range_values[i];
         tmp_val_date = new Date(tmp_val);
-      
+
         if (tmp_val_date.getYear() == current_date.getYear() && tmp_val_date.getMonth() == current_date.getMonth()){
             sheet.hideRows(2, j-1);
             return;
@@ -163,7 +158,7 @@ function hideRows(){
 }
 
 function getTotalByMonth(sheet) {
-  sheet = SpreadsheetApp.openById(ssId).getSheetByName('daily expenses');
+    sheet = SpreadsheetApp.openById(ssId).getSheetByName('daily expenses');
 
     var s=sheet;
     var date = new Date();
@@ -171,7 +166,7 @@ function getTotalByMonth(sheet) {
     var current_year = date.getYear();
 
     var tmp_date, res;
-    var v = s.getRange("A:H").getValues().map(function (x) {
+    var v = s.getRange("A2:H").getValues().map(function (x) {
         tmp_date = new Date(x[0]);
         if (tmp_date.getYear() == current_year && tmp_date.getMonth()==current_month && x[6] == "TOTAL" ) {
             res = x[7];
@@ -184,11 +179,11 @@ function getTotalByMonth(sheet) {
 }
 
 function getCategories(sheet) {
-//  sheet = SpreadsheetApp.openById(ssId).getSheetByName('daily expenses');
+    //sheet = SpreadsheetApp.openById(ssId).getSheetByName('daily expenses');
     var s = sheet, res=[], i=0;
 
     s.getRange("K2:L100").getValues().map(function (x, k) {
-        if (x != '' ) {
+        if (x[0] != '' ) {
 
             res[i] = x;
         }else{
@@ -196,11 +191,12 @@ function getCategories(sheet) {
         }
         i++;
     });
+    //Logger.log(res);
     return res;
 }
 
 function getIncomeByMonth(sheet) {
-//  var sheet = SpreadsheetApp.openById(ssId).getSheetByName('daily expenses');
+    //var sheet = SpreadsheetApp.openById(ssId).getSheetByName('daily expenses');
 
     var s=sheet;
     var date = new Date();
@@ -221,26 +217,88 @@ function getIncomeByMonth(sheet) {
 }
 
 
-function getCategoryValueByMonth(sheet, category) {
-  //category = "";
-  //var sheet = SpreadsheetApp.openById(ssId).getSheetByName('daily expenses');
-  
+function getCategoryValueByMonth(sheet, category, month) {
+    //category = "food";
+    //month = 2;
+    //var sheet = SpreadsheetApp.openById(ssId).getSheetByName('daily expenses');
+
     var s=sheet;
     var date = new Date();
-    var current_month = date.getMonth();
+    var current_month = month ? month : date.getMonth();
     var current_year = date.getYear();
+    var right_month=false;
+    var prev_category = '';
 
-    var tmp_date, res;
+    var tmp_date, res=0;
 
     var v = s.getRange("A:H").getValues().map(function (x) {
+        if (x[6] == null){
+            return;
+        }
+
         tmp_date = new Date(x[0]);
-        if (tmp_date.getYear() == current_year && tmp_date.getMonth()==current_month && x[6] == category ) {
+        //if ( !right_month ) {
+        if ( tmp_date.getYear() == current_year && tmp_date.getMonth()==current_month ) {
+            right_month = true;
+            prev_category = x[6];
+        } else {
+            return;
+        }
+        //}
+
+        if (x[6] == category && right_month) {
+
             res = x[7];
         }
         return x[7];
     });
-    //Logger.log(res);
-    return {"month": current_month+1, "value": res}
+    Logger.log(res.toFixed(0));
+    Logger.log(current_month);
+    return {"month": current_month+1, "value": res.toFixed(0)}
+}
+
+function checkExpenses(sheet) {
+    //var sheet = SpreadsheetApp.openById(ssId).getSheetByName('daily expenses');
+
+    var date = new Date();
+    var prev_month = date.getMonth()-1;
+
+    var current_month = date.getMonth();
+    var current_year = date.getYear();
+    var start_month_balance = 0
+    var prev_apartment = 0
+    var prev_income = 0
+
+    var v = sheet.getRange("A:H").getValues().map(function (x) {
+        if (x[6] == null){
+            return;
+        }
+        tmp_date = new Date(x[0]);
+
+        if (tmp_date.getYear() == current_year && tmp_date.getMonth()==prev_month) {
+            if (x[6] == 'TOTAL') {
+                prev_total = x[7];
+            }
+            if (x[6] == 'income') {
+                prev_income = x[7];
+            }
+            if (x[6] == 'apartment') {
+                prev_apartment = x[7];
+            }
+        }
+        if (tmp_date.getYear() == current_year && tmp_date.getMonth()==current_month) {
+            if (x[3].indexOf('остаток') >= 0) {
+                start_month_balance += x[5];
+            }
+        }
+        return x[7];
+    });
+
+    balance = prev_income - (prev_total + prev_apartment)
+    //Logger.log("difference " + balance + " " + start_month_balance)
+    // prev_month_balance - разница между тем сколько было получено и потрачено в прошлом месяце
+    // start_month_balance - количество денег на старт этого месяца
+    return {"prev_month_balance": balance.toFixed(0), "current_month_balance": start_month_balance.toFixed(0), "diff": balance.toFixed(0) - start_month_balance.toFixed(0)}
 }
   
   
